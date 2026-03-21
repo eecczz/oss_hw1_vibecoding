@@ -1,0 +1,14 @@
+[project]
+name = "frontend"
+version = "0.1.0"
+description = "Streamlit frontend for the weather map app."
+readme = "../README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2.0",
+    "requests>=2.32.0",
+    "streamlit>=1.44.0",
+]
+
+[tool.streamlit]
+server.headless = true
