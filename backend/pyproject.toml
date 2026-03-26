@@ -1,12 +1,15 @@
 [project]
 name = "backend"
-version = "0.1.0"
-description = "FastAPI backend for the weather map app."
+version = "0.2.0"
+description = "FastAPI backend for the public toilet map app."
 readme = "../README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.0",
     "pandas>=2.2.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-jose[cryptography]>=3.3.0",
+    "python-dotenv>=1.0.1",
     "requests>=2.32.0",
     "uvicorn>=0.34.0",
 ]

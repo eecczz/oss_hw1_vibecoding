@@ -1,27 +1,54 @@
-from contextlib import closing
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.database import get_connection
-from app.settings import DB_PATH
+from app.api.auth import router as auth_router
+from app.api.toilets import router as toilet_router
+from app.repositories.toilets import count_toilets, initialize_database
+from app.services.importer import seed_database_if_empty
+from app.settings import settings
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    initialize_database()
+    seed_database_if_empty()
+    yield
 
 
 app = FastAPI(
-    title="Weather Map API",
-    version="0.1.0",
-    description="중기예보 지도 앱용 FastAPI 백엔드 초기 스캐폴드",
+    title="Public Toilet Map API",
+    version="0.3.0",
+    description="공중화장실 정보를 조회하고 JWT 인증을 제공하는 FastAPI 백엔드",
+    lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.on_event("startup")
-def startup() -> None:
-    with closing(get_connection()) as connection:
-        connection.execute("SELECT 1")
+app.include_router(auth_router)
+app.include_router(toilet_router)
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "message": "Public Toilet Map API",
+        "health": "/health",
+        "docs": "/docs",
+    }
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
+def health() -> dict[str, int | str]:
     return {
         "status": "ok",
-        "database": str(DB_PATH),
+        "database": str(settings.db_path),
+        "toilet_count": count_toilets(),
     }

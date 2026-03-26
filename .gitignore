@@ -7,5 +7,6 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .streamlit/secrets.toml
+.env
 backend/data/*.sqlite3
 backend/data/*.db
